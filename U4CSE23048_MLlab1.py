@@ -61,7 +61,7 @@ def randomStatistics5(n):
     op.sort()
     mean1 = sum(op) / n
     mode1 = statistics.mode(op)
-    median1 = op[n//]
+    median1 = op[n//2]
     return mean1,mode1,median1
 
 
