@@ -19,6 +19,7 @@ def matrixMultiplier2(mat1, mat2):
         return "Multiplication not possible. INVALID"
 
     rows1 = len(mat1)
+    rows2 = len(mat2)
     cols1 = len(mat1[0])
     cols2 = len(mat2[0])
 
