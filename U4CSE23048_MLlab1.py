@@ -11,7 +11,7 @@ def countVC1(text):
             vow += 1
         else:
             con += 1
-    return vow, con,1
+    return vow, con
 
 
 def matrixMultiplier2(mat1, mat2):
