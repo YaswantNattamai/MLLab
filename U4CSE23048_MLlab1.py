@@ -68,13 +68,13 @@ def randomStatistics5(n):
     return mean1, mode1, median1
 
 
-
+print("")
 print("Lab Question 1: Vowel and Consonant Counter")
 text = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 vowels, consonants = countVC1(text)
 print("Vowels in the text:", vowels)
 print("Consonants in the text:", consonants)
-print("\n" + "_" * 60 + "\n")
+print("___________________________________________________________")
 
 print("Lab Question 2: Matrix Multiplication")
 a = [[1, 2], [3, 4]]
@@ -85,7 +85,7 @@ print("Matrix B:", b)
 print("Result of multiplication:")
 for row in result:
     print(row)
-print("\n" + "_" * 60 + "\n")
+print("___________________________________________________________")
 
 print("Lab Question 3: Common Elements Finder")
 list1 = [1, 2, 3, 4, 5]
@@ -93,7 +93,7 @@ list2 = [4, 5, 6, 7, 8]
 print("List 1:", list1)
 print("List 2:", list2)
 print("Common elements:", common3(list1, list2))
-print("\n" + "_" * 60 + "\n")
+print("___________________________________________________________")
 
 print("Lab Question 4: Matrix Transpose")
 mat = [[1, 2, 3], [4, 5, 6]]
@@ -104,7 +104,7 @@ transposed = transpose4(mat)
 print("Transposed Matrix:")
 for row in transposed:
     print(row)
-print("\n" + "_" * 60 + "\n")
+print("___________________________________________________________")
 
 print("Lab Question 5: Random Statistics")
 mean1, mode1, median1 = randomStatistics5(11)
