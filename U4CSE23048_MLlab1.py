@@ -80,9 +80,6 @@ print("Lab Question 2: Matrix Multiplication")
 a = [[1, 2], [3, 4]]
 b = [[5, 6], [7, 8]]
 result = matrixMultiplier2(a, b)
-print("Matrix A:", a)
-print("Matrix B:", b)
-print("Result of multiplication:")
 for row in result:
     print(row)
 print("___________________________________________________________")
@@ -90,8 +87,6 @@ print("___________________________________________________________")
 print("Lab Question 3: Common Elements Finder")
 list1 = [1, 2, 3, 4, 5]
 list2 = [4, 5, 6, 7, 8]
-print("List 1:", list1)
-print("List 2:", list2)
 print("Common elements:", common3(list1, list2))
 print("___________________________________________________________")
 
