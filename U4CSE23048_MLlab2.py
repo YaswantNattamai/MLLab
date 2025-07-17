@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
 
+'''                                                             A1                                                                  '''
+
 def load_purchase_data(filepath):
     """Loads the 'Purchase data' sheet and returns matrix A and target vector C."""
     df = pd.read_excel(filepath, sheet_name="Purchase data")
@@ -27,26 +29,21 @@ def calculate_cost_using_pinv(A, C):
     X = np.dot(pseudo_inv, C)
     return X
 
-# ========== MAIN EXECUTION ==========
-file_path = "Lab Session Data.xlsx"  # Must be in the same folder
+file_path = "Lab Session Data.xlsx"  
 
-# Load and clean data
 A, C, df_purchase = load_purchase_data(file_path)
 A, C = clean_input_matrices(A, C)
 
-# Debugging checks
 print("\nSample of cleaned A matrix (first 2 rows):")
 print(A[:2])
 print("\nSample of cleaned C vector (first 2 values):")
 print(C[:2])
 
-# Get vector space properties
 dim, n_vec, rank = get_vector_space_details(A)
 
-# Compute cost vector
 X = calculate_cost_using_pinv(A, C)
 
-# Final output
+
 print("\n=== Linear Algebra Summary ===")
 print("Vector space dimension:", dim)
 print("Number of vectors:", n_vec)
