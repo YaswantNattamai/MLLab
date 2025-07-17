@@ -50,3 +50,6 @@ print("Number of vectors:", n_vec)
 print("Rank of matrix A:", rank)
 print("\nEstimated cost of each product (X):")
 print(X)
+
+
+'''                                                         A2                                                                        '''
