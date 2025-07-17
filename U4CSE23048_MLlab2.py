@@ -1,55 +1,32 @@
 import pandas as pd
 import numpy as np
 
-'''                                                             A1                                                                  '''
+def load_data(file_path, sheet_name):
+    df = pd.read_excel(file_path, sheet_name=sheet_name)
+    A = df.iloc[:, 1:4].to_numpy()  # Columns: Candies, Mangoes, Milk
+    C = df.iloc[:, 4:5].to_numpy()  # Column: Payment
+    return A, C
 
-def load_purchase_data(filepath):
-    """Loads the 'Purchase data' sheet and returns matrix A and target vector C."""
-    df = pd.read_excel(filepath, sheet_name="Purchase data")
-    A = df.iloc[:, 1:-1].values  # Exclude first column (ID) and last column (Total)
-    C = df.iloc[:, -1].values    # Total column
-    return A, C, df
+def get_vector_space_info(A):
+    dimensionality = len(A[0])
+    num_vectors = len(A)
+    rank = np.linalg.matrix_rank(A)
+    return dimensionality, num_vectors, rank
 
-def clean_input_matrices(A, C):
-    """Converts all values to float and replaces NaN/Inf/-Inf with 0."""
-    A_clean = np.nan_to_num(A.astype(np.float64), nan=0.0, posinf=0.0, neginf=0.0)
-    C_clean = np.nan_to_num(C.astype(np.float64), nan=0.0, posinf=0.0, neginf=0.0)
-    return A_clean, C_clean
+def estimate_product_costs(A, C):
+    pinverse = np.linalg.pinv(A)
+    X = pinverse @ C
+    return X.flatten()
 
-def get_vector_space_details(A):
-    """Returns dimension, number of vectors, and rank of matrix A."""
-    dimension = A.shape[1]           # Number of columns
-    num_vectors = A.shape[0]         # Number of rows
-    rank = np.linalg.matrix_rank(A)  # Rank
-    return dimension, num_vectors, rank
+# === MAIN PROGRAM ===
+file_path = "Lab Session Data.xlsx"
+sheet_name = "Purchase data"
 
-def calculate_cost_using_pinv(A, C):
-    """Computes the pseudo-inverse solution X for AX = C."""
-    pseudo_inv = np.linalg.pinv(A)
-    X = np.dot(pseudo_inv, C)
-    return X
+A, C = load_data(file_path, sheet_name)
+dim, n_vec, rank = get_vector_space_info(A)
+X = estimate_product_costs(A, C)
 
-file_path = "Lab Session Data.xlsx"  
-
-A, C, df_purchase = load_purchase_data(file_path)
-A, C = clean_input_matrices(A, C)
-
-print("\nSample of cleaned A matrix (first 2 rows):")
-print(A[:2])
-print("\nSample of cleaned C vector (first 2 values):")
-print(C[:2])
-
-dim, n_vec, rank = get_vector_space_details(A)
-
-X = calculate_cost_using_pinv(A, C)
-
-
-print("\n=== Linear Algebra Summary ===")
-print("Vector space dimension:", dim)
-print("Number of vectors:", n_vec)
+print("Dimensionality of the Vector Space:", dim)
+print("Vectors in the vector space:", n_vec)
 print("Rank of matrix A:", rank)
-print("\nEstimated cost of each product (X):")
-print(X)
-
-
-'''                                                                                                                                 '''
+print("Estimated product costs:", X)
