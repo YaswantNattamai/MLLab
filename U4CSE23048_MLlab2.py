@@ -24,7 +24,7 @@ def generate_rich_poor_labels(C):
     return [1 if payment > 200 else 0 for payment in C.flatten()]
 
 # === MAIN PROGRAM ===
-file_path = "dataset.xlsx"
+file_path = "Lab Session Data.xlsx"
 sheet_name = "Purchase data"
 
 A, C, df = load_data(file_path, sheet_name)
