@@ -1,13 +1,27 @@
+# Machine Learning Lab Assignment: Consolidated and Structured Code
+# Author: [Your Name]
+# Roll No: [Your Roll Number]
+# Date: [Today's Date]
+# ----------------------------------------------
+# All questions (A1-A9) with clearly separated code blocks and final output section for easy reproduction.
+# ----------------------------------------------
+
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import classification_report
+from sklearn.preprocessing import LabelEncoder, MinMaxScaler
+import statistics
 
-#A1
+# --------- A1: Purchase Data Analysis ---------
 
- 
 def load_purchase_data(file_path="Lab-Session-Data.xlsx"):
-    """Load the 'Purchase data' worksheet and return the feature and label matrices."""
+    """Load the 'Purchase data' worksheet and return feature and label matrices."""
     df = pd.read_excel(file_path, sheet_name='Purchase data')
-    X = df.iloc[:, 1:4].values   # Quantities of Candies, Mangoes, Milk Packets
+    X = df.iloc[:, 1:4].values  # Quantities of Candies, Mangoes, Milk Packets
     y = df.iloc[:, 4].values.reshape(-1, 1)  # Payment column
     return X, y, df
 
@@ -23,11 +37,48 @@ def estimate_product_costs(A, C):
     costs = np.linalg.pinv(A) @ C
     return costs.flatten()
 
-#A2
+def get_estimated_coefficients(product_costs):
+    """Return the estimated coefficients for the cost equation."""
+    return {
+        'Candies (per piece)': product_costs[0],
+        'Mangoes (per kg)': product_costs[1],
+        'Milk Packets (per packet)': product_costs[2]
+    }
 
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import classification_report
+def format_cost_equation(product_costs):
+    """Formats the estimated cost equation as a string."""
+    return (
+        f"Estimated Payment = "
+        f"{product_costs[0]:.2f} * Candies + "
+        f"{product_costs[1]:.2f} * Mangoes + "
+        f"{product_costs[2]:.2f} * Milk Packets"
+    )
+
+def interpret_matrix_rank(rank, dimension):
+    """
+    Interprets the meaning of the feature matrix rank in this context.
+    """
+    if rank == dimension:
+        return (
+            "The feature matrix has full rank. All products contribute "
+            "independently to the purchase payment and their individual costs "
+            "can be uniquely estimated."
+        )
+    else:
+        return (
+            f"The feature matrix rank ({rank}) is less than the dimension ({dimension}).\n"
+            "There is redundancy or collinearity—at least one product's quantity is a linear "
+            "combination of the others. The costs cannot be uniquely identified; "
+            "infinite solutions exist."
+        )
+
+def get_dimension_and_vectors(X):
+    """
+    Returns the dimension (number of features) and number of data points.
+    """
+    return X.shape[1], X.shape[0]
+
+# --------- A2: Rich/Poor Classifier ---------
 
 def add_rich_poor_labels(df):
     """Add 'Class' column to DataFrame: RICH if payment > 200; else POOR."""
@@ -44,12 +95,7 @@ def train_classifier(A, labels):
     report = classification_report(y_test, y_pred)
     return report
 
-#A3
-
-import statistics
-import matplotlib.pyplot as plt
-import seaborn as sns
-from sklearn.preprocessing import LabelEncoder
+# --------- A3: IRCTC Stock Data Analysis ---------
 
 def load_irctc_stock_data(file_path="Lab-Session-Data.xlsx"):
     """Load 'IRCTC Stock Price' worksheet as DataFrame."""
@@ -94,11 +140,11 @@ def plot_chg_vs_day(df):
     plt.tight_layout()
     plt.show()
 
-#A4
+# --------- A4: Thyroid Data Exploration ---------
 
 def load_thyroid_data(file_path="Lab-Session-Data.xlsx"):
-    return pd.read_excel(file_path, sheet_name='thyroid0387_UCI',na_values=['?'])
-    
+    return pd.read_excel(file_path, sheet_name='thyroid0387_UCI', na_values=['?'])
+
 def summarize_attributes(df):
     """Return summary table for each attribute: datatype, kind, encoding, missing, range."""
     summary = []
@@ -122,7 +168,8 @@ def summarize_attributes(df):
             encoding = 'None'
             rng = (col_data.min(), col_data.max())
         n_missing = col_data.isnull().sum() + np.sum(col_data == '?')
-        summary.append({'column': col, 'dtype': str(dtype), 'attr_type': attr_type, 'encoding': encoding, 'missing': n_missing, 'range': rng})
+        summary.append({'column': col, 'dtype': str(dtype), 'attr_type': attr_type,
+                        'encoding': encoding, 'missing': n_missing, 'range': rng})
     return pd.DataFrame(summary)
 
 def numeric_stats(df):
@@ -143,8 +190,7 @@ def outlier_count(df):
         outliers[col] = mask.sum()
     return outliers
 
-
-#A5
+# --------- A5: Jaccard & SMC Similarity ---------
 
 def get_first_two_binary_vectors(df):
     """Extract the first two binary observation vectors from binary columns."""
@@ -172,63 +218,49 @@ def smc_coefficient(vec1, vec2):
     total = f11 + f00 + f10 + f01
     return (f11 + f00) / total if total != 0 else np.nan
 
-'''                                                     A6                                                                            '''
-import pandas as pd
-import numpy as np
+# --------- A6: Cosine Similarity Function ---------
 
-# Load the dataset (adjust the filename as needed)
-df_thyroid = pd.read_excel('dataset.xlsx', sheet_name='thyroid0387_UCI')
+def cosine_similarity(A, B):
+    """
+    Compute the cosine similarity between two vectors A and B.
+    """
+    A = np.asarray(A).flatten()
+    B = np.asarray(B).flatten()
+    numerator = np.dot(A, B)
+    denominator = np.linalg.norm(A) * np.linalg.norm(B)
+    if denominator == 0:
+        return 0.0
+    return numerator / denominator
 
+# --------- A7: Analyze Similarity Metrics ---------
 
-def cosineSimilarity(df):
-    # Select two observations (replace 0 and 1 with appropriate indices of the desired records)
-    vec1 = df.iloc[0]
-    vec2 = df.iloc[1]
-
-    # Select only numerical columns for the vectors (drop non-numeric columns like 'sex', 'Condition', etc.)
-    numeric_cols = df.select_dtypes(include=[np.number]).columns
-    vector1 = vec1[numeric_cols].values.astype(float)
-    vector2 = vec2[numeric_cols].values.astype(float)
-
-    # Calculate Cosine Similarity
-    dot_product = np.dot(vector1, vector2)
-    norm1 = np.linalg.norm(vector1)
-    norm2 = np.linalg.norm(vector2)
-    cosine_similarity = dot_product / (norm1 * norm2)
-
-    print("Cosine Similarity", cosine_similarity)
-
-
-# A7
 def analyze_similarity_metrics(file_path, sheet_name, save_path=None):
-    # Load dataset
+    """
+    Analyze and plot Cosine Similarity, Jaccard, and SMC matrices for first 20 observations.
+    """
     df = pd.read_excel(file_path, sheet_name=sheet_name, na_values=["?"])
-
-    # Handle missing values and encode categorical columns
+    # Impute and encode categorical columns
     for col in df.columns:
         if df[col].dtype == 'object':
             df[col] = df[col].fillna(df[col].mode()[0])
             df[col] = LabelEncoder().fit_transform(df[col])
         else:
             df[col] = df[col].fillna(df[col].mean())
-
-    # Select first 20 observations
     df_20 = df.iloc[:20].reset_index(drop=True)
-
     # Cosine Similarity
-    cos_sim_matrix = cosineSimilarity(df_20)
-
+    cos_sim_matrix = np.zeros((20, 20))
+    numeric_cols = df_20.select_dtypes(include=[np.number]).columns
+    for i in range(20):
+        for j in range(20):
+            cos_sim_matrix[i, j] = cosine_similarity(df_20.loc[i, numeric_cols], df_20.loc[j, numeric_cols])
     # Identify binary columns
     binary_cols = [col for col in df_20.columns if set(df_20[col].unique()).issubset({0, 1})]
-
-    # Define Jaccard and SMC
     def jaccard(a, b):
         f11 = np.sum((a == 1) & (b == 1))
         f10 = np.sum((a == 1) & (b == 0))
         f01 = np.sum((a == 0) & (b == 1))
         denom = f11 + f10 + f01
         return f11 / denom if denom != 0 else 0
-
     def smc(a, b):
         f11 = np.sum((a == 1) & (b == 1))
         f00 = np.sum((a == 0) & (b == 0))
@@ -236,55 +268,41 @@ def analyze_similarity_metrics(file_path, sheet_name, save_path=None):
         f01 = np.sum((a == 0) & (b == 1))
         total = f11 + f00 + f10 + f01
         return (f11 + f00) / total if total != 0 else 0
-
-    # Compute JC and SMC matrices
     n = len(df_20)
     jc_matrix = np.zeros((n, n))
     smc_matrix = np.zeros((n, n))
-
     for i in range(n):
         for j in range(n):
             vec1 = df_20.loc[i, binary_cols].values
             vec2 = df_20.loc[j, binary_cols].values
             jc_matrix[i, j] = jaccard(vec1, vec2)
             smc_matrix[i, j] = smc(vec1, vec2)
-
     # Plot heatmaps
     plt.figure(figsize=(18, 5))
-
     plt.subplot(1, 3, 1)
     sns.heatmap(jc_matrix, annot=False, cmap='Blues', square=True, cbar=True)
     plt.title("Jaccard Coefficient")
-
     plt.subplot(1, 3, 2)
     sns.heatmap(smc_matrix, annot=False, cmap='Greens', square=True, cbar=True)
     plt.title("Simple Matching Coefficient")
-
     plt.subplot(1, 3, 3)
     sns.heatmap(cos_sim_matrix, annot=False, cmap='Reds', square=True, cbar=True)
     plt.title("Cosine Similarity")
-
     plt.tight_layout()
-    
     if save_path:
         plt.savefig(save_path)
     plt.show()
 
-#A8
-import pandas as pd
-import numpy as np
+# --------- A8: Imputation Summary ---------
 
 def impute_missing_values(file_path, sheet_name, na_values=["?"], return_df=False):
-    # Load the data
+    """Impute missing values with mode for categorical and mean/median for numeric columns."""
     df = pd.read_excel(file_path, sheet_name=sheet_name, na_values=na_values)
     filled_columns = []
-
     # Impute categorical columns with Mode
     cat_cols = df.select_dtypes(include='object').columns
     df[cat_cols] = df[cat_cols].apply(lambda col: col.fillna(col.mode()[0]))
     filled_columns += [f"{col} (Mode)" for col in cat_cols if df[col].isnull().sum() == 0]
-
-    # Helper function to impute numeric columns based on outlier presence
     def impute_numeric(col):
         if col.isnull().sum() == 0:
             return col
@@ -294,37 +312,26 @@ def impute_missing_values(file_path, sheet_name, na_values=["?"], return_df=Fals
         method = "Median" if has_outlier else "Mean"
         filled_columns.append(f"{col.name} ({method})")
         return col.fillna(col.median() if has_outlier else col.mean())
-
-    # Apply to numeric columns
     num_cols = df.select_dtypes(include=np.number).columns
     df[num_cols] = df[num_cols].apply(impute_numeric)
-
-    # Print summary
     print("Imputation complete.\nFilled columns and methods used:")
     for col in filled_columns:
         print(f"→ {col}")
-
     remaining_missing = df.isnull().sum().sum()
     if remaining_missing == 0:
         print("\nAll missing values successfully imputed.")
     else:
         print(f"\nThere are still {remaining_missing} missing values remaining.")
-
     return df if return_df else None
 
-#A9
-import pandas as pd
-import numpy as np
-from sklearn.preprocessing import MinMaxScaler
+# --------- A9: Min-Max Normalization ---------
 
 def impute_and_normalize(file_path, sheet_name, na_values=["?"], return_df=False):
-    # Load dataset
+    """Impute missing values (mode/mean/median) and normalize numeric columns with Min-Max."""
     df = pd.read_excel(file_path, sheet_name=sheet_name, na_values=na_values)
-
     # Impute categorical columns with mode
     for col in df.select_dtypes(include='object').columns:
         df[col] = df[col].fillna(df[col].mode()[0])
-
     # Impute numerical columns with mean or median based on outliers
     for col in df.select_dtypes(include=np.number).columns:
         if df[col].isnull().sum() == 0:
@@ -333,75 +340,106 @@ def impute_and_normalize(file_path, sheet_name, na_values=["?"], return_df=False
         iqr = q3 - q1
         has_outlier = ((df[col] < (q1 - 1.5 * iqr)) | (df[col] > (q3 + 1.5 * iqr))).any()
         df[col] = df[col].fillna(df[col].median() if has_outlier else df[col].mean())
-
     # Normalize numeric columns using Min-Max scaling
     numeric_cols = df.select_dtypes(include=np.number).columns
     scaler = MinMaxScaler()
     df_normalized = df.copy()
     df_normalized[numeric_cols] = scaler.fit_transform(df[numeric_cols])
-
     print("Normalization complete. Sample normalized data:")
     print(df_normalized[numeric_cols].head())
-
     return df_normalized if return_df else None
 
+# ==============================================
+#                  MAIN OUTPUTS
+# ==============================================
+if __name__ == "__main__":
+    # --- A1: Purchase Data Analysis
+    A, C, purchase_df = load_purchase_data()
+    dim, n_vecs, rk = get_vector_space_properties(A)
+    costs = estimate_product_costs(A, C)
+    print("A1: PURCHASE DATA ANALYSIS")
+    print(f"Dimensionality (features): {dim}")
+    print(f"Number of vectors (rows/customers): {n_vecs}")
+    print(f"Rank of Purchase Quantity Matrix: {rk}")
+    print(f"Estimated product costs: {costs}")
 
+    coeffs = get_estimated_coefficients(costs)
+    print("\nA6: Estimated per-unit product costs:")
+    for k, v in coeffs.items():
+        print(f"{k}: {v:.2f}")
 
-# --------- A1: Purchase Data Analysis ---------
-A, C, purchase_df = load_purchase_data()
-dim, n_vecs, rk = get_vector_space_properties(A)
-costs = estimate_product_costs(A, C)
-print("A1: PURCHASE DATA ANALYSIS")
-print(f"Dimensionality of vector space: {dim}")
-print(f"Number of vectors: {n_vecs}")
-print(f"Rank of Purchase Quantity Matrix: {rk}")
-print(f"Estimated product costs: {costs}\n")
+    eqn = format_cost_equation(costs)
+    print("\nA7: Estimated cost equation:")
+    print(eqn)
 
-# --------- A2: Rich/Poor Classifier ---------
-purchase_df = add_rich_poor_labels(purchase_df)
-report = train_classifier(A, purchase_df['Class'])
-print("A2: RICH/POOR CLASSIFICATION REPORT:")
-print(report)
+    print("\nA8: Interpretation of matrix rank:")
+    print(interpret_matrix_rank(rk, dim))
 
-# --------- A3: IRCTC Stock Data Analysis ---------
-stock_df = load_irctc_stock_data()
-mean_price, var_price = get_price_mean_variance(stock_df)
-wed_mean, n_wed, n_all = wednesday_price_stats(stock_df)
-april_mean = april_price_mean(stock_df)
-loss_prob = loss_probability(stock_df)
-profit_wed_prob = profit_probability_wednesday(stock_df)
-cond_prob = conditional_profit_given_wednesday(stock_df)
-print("A3: IRCTC STOCK DATA ANALYSIS")
-print(f"Mean price: {mean_price}, Variance: {var_price}")
-print(f"Wednesday mean price: {wed_mean} (Wednesdays: {n_wed}, Total: {n_all})")
-print(f"April mean price: {april_mean}")
-print(f"Probability of Loss: {loss_prob:.2f}")
-print(f"Probability of Profit on Wednesday: {profit_wed_prob:.2f}")
-print(f"Conditional P(Profit|Wednesday): {cond_prob:.2f}")
+    dim2, nvec2 = get_dimension_and_vectors(A)
+    print(f"\nA9: Dimension: {dim2}, Number of vectors: {nvec2}")
 
-print("Plotting Chg% vs Day of Week...")
-plot_chg_vs_day(stock_df)  # This will show a plot
+    # --- A2: Rich/Poor Classifier
+    purchase_df = add_rich_poor_labels(purchase_df)
+    report = train_classifier(A, purchase_df['Class'])
+    print("\nA2: RICH/POOR CLASSIFICATION REPORT:")
+    print(report)
 
-# --------- A4: Thyroid Data Exploration ---------
-thy_df = load_thyroid_data()
-summary_df = summarize_attributes(thy_df)
-num_stats = numeric_stats(thy_df)
-outliers = outlier_count(thy_df)
-print("A4: THYROID DATA SUMMARY")
-print("Attribute summary:\n", summary_df)
-print("Numeric mean and variance:\n", num_stats)
-print("Outlier count (numeric cols):\n", outliers)
+    # --- A3: IRCTC Stock Data Analysis
+    stock_df = load_irctc_stock_data()
+    mean_price, var_price = get_price_mean_variance(stock_df)
+    wed_mean, n_wed, n_all = wednesday_price_stats(stock_df)
+    april_mean = april_price_mean(stock_df)
+    loss_prob = loss_probability(stock_df)
+    profit_wed_prob = profit_probability_wednesday(stock_df)
+    cond_prob = conditional_profit_given_wednesday(stock_df)
+    print("\nA3: IRCTC STOCK DATA ANALYSIS")
+    print(f"Mean price: {mean_price:.2f}, Variance: {var_price:.2f}")
+    print(f"Wednesday mean price: {wed_mean:.2f} (Wednesdays: {n_wed}, Total: {n_all})")
+    print(f"April mean price: {april_mean:.2f}")
+    print(f"Probability of Loss: {loss_prob:.2f}")
+    print(f"Probability of Profit on Wednesday: {profit_wed_prob:.2f}")
+    print(f"Conditional P(Profit|Wednesday): {cond_prob:.2f}")
+    print("Plotting Chg% vs Day of Week...")
+    plot_chg_vs_day(stock_df)
 
-# --------- A5: Jaccard & SMC Similarity ---------
-vec1, vec2 = get_first_two_binary_vectors(thy_df)
-jc = jaccard_coefficient(vec1, vec2)
-smc = smc_coefficient(vec1, vec2)
-print("A5: SIMILARITY MEASURES")
-print(f"Jaccard coefficient: {jc:.3f}")
-print(f"Simple Matching coefficient: {smc:.3f}")
-if jc < smc:
-    print("Jaccard is stricter: only positive matches; SMC includes negatives.")
-else:
-    print("Both coefficients indicate similarity, but are used differently.")
+    # --- A4: Thyroid Data Summary
+    thy_df = load_thyroid_data()
+    summary_df = summarize_attributes(thy_df)
+    num_stats = numeric_stats(thy_df)
+    outliers = outlier_count(thy_df)
+    print("\nA4: THYROID DATA SUMMARY")
+    print(summary_df)
+    print("Numeric mean and variance:\n", num_stats)
+    print("Outlier count (numeric cols):\n", outliers)
 
+    # --- A5: Jaccard & SMC Similarity on Binary Vectors
+    vec1, vec2 = get_first_two_binary_vectors(thy_df)
+    jc = jaccard_coefficient(vec1, vec2)
+    smc = smc_coefficient(vec1, vec2)
+    print("\nA5: SIMILARITY MEASURES for first two binary vectors")
+    print(f"Jaccard coefficient: {jc:.3f}")
+    print(f"Simple Matching coefficient: {smc:.3f}")
+    if jc < smc:
+        print("Jaccard is stricter: only positive matches; SMC includes negatives.")
+    else:
+        print("Both coefficients indicate similarity, but are used differently.")
 
+    # --- A6: Cosine Similarity
+    print("\nA6: Cosine similarity of first two numeric observations (thyroid dataset):")
+    numeric_cols = thy_df.select_dtypes(include=[np.number]).columns
+    vec1_num = thy_df.loc[0, numeric_cols].values
+    vec2_num = thy_df.loc[1, numeric_cols].values
+    cos_sim = cosine_similarity(vec1_num, vec2_num)
+    print(f"Cosine Similarity: {cos_sim:.4f}")
+
+    # --- A7: Analyze Similarity Metrics (can take time and display multiple plots)
+    print("\nA7: Analyzing and plotting similarity metrics for first 20 thyroid records ...")
+    analyze_similarity_metrics("Lab-Session-Data.xlsx", "thyroid0387_UCI")
+
+    # --- A8: Imputation Demonstration
+    print("\nA8: Imputation demonstration (thyroid data):")
+    impute_missing_values("Lab-Session-Data.xlsx", "thyroid0387_UCI")
+
+    # --- A9: Min-Max Normalization Demonstration
+    print("\nA9: Min-Max normalization demonstration (thyroid data):")
+    impute_and_normalize("Lab-Session-Data.xlsx", "thyroid0387_UCI")
