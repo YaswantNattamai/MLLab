@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from sklearn 
 
 #A1
 
@@ -49,6 +50,7 @@ def train_classifier(A, labels):
 import statistics
 import matplotlib.pyplot as plt
 import seaborn as sns
+from sklearn.preprocessing import LabelEncoder
 
 def load_irctc_stock_data(file_path="Lab-Session-Data.xlsx"):
     """Load 'IRCTC Stock Price' worksheet as DataFrame."""
@@ -171,7 +173,146 @@ def smc_coefficient(vec1, vec2):
     total = f11 + f00 + f10 + f01
     return (f11 + f00) / total if total != 0 else np.nan
 
-'''                                                                                                                                 '''
+'''                                                     A6                                                                            '''
+import pandas as pd
+import numpy as np
+
+# Load the dataset (adjust the filename as needed)
+df_thyroid = pd.read_excel('dataset.xlsx', sheet_name='thyroid0387_UCI')
+
+
+def cosineSimilarity(df):
+    # Select two observations (replace 0 and 1 with appropriate indices of the desired records)
+    vec1 = df.iloc[0]
+    vec2 = df.iloc[1]
+
+    # Select only numerical columns for the vectors (drop non-numeric columns like 'sex', 'Condition', etc.)
+    numeric_cols = df.select_dtypes(include=[np.number]).columns
+    vector1 = vec1[numeric_cols].values.astype(float)
+    vector2 = vec2[numeric_cols].values.astype(float)
+
+    # Calculate Cosine Similarity
+    dot_product = np.dot(vector1, vector2)
+    norm1 = np.linalg.norm(vector1)
+    norm2 = np.linalg.norm(vector2)
+    cosine_similarity = dot_product / (norm1 * norm2)
+
+    print("Cosine Similarity", cosine_similarity)
+
+
+# A7
+def analyze_similarity_metrics(file_path, sheet_name, save_path=None):
+    # Load dataset
+    df = pd.read_excel(file_path, sheet_name=sheet_name, na_values=["?"])
+
+    # Handle missing values and encode categorical columns
+    for col in df.columns:
+        if df[col].dtype == 'object':
+            df[col] = df[col].fillna(df[col].mode()[0])
+            df[col] = LabelEncoder().fit_transform(df[col])
+        else:
+            df[col] = df[col].fillna(df[col].mean())
+
+    # Select first 20 observations
+    df_20 = df.iloc[:20].reset_index(drop=True)
+
+    # Cosine Similarity
+    cos_sim_matrix = cosineSimilarity(df_20)
+
+    # Identify binary columns
+    binary_cols = [col for col in df_20.columns if set(df_20[col].unique()).issubset({0, 1})]
+
+    # Define Jaccard and SMC
+    def jaccard(a, b):
+        f11 = np.sum((a == 1) & (b == 1))
+        f10 = np.sum((a == 1) & (b == 0))
+        f01 = np.sum((a == 0) & (b == 1))
+        denom = f11 + f10 + f01
+        return f11 / denom if denom != 0 else 0
+
+    def smc(a, b):
+        f11 = np.sum((a == 1) & (b == 1))
+        f00 = np.sum((a == 0) & (b == 0))
+        f10 = np.sum((a == 1) & (b == 0))
+        f01 = np.sum((a == 0) & (b == 1))
+        total = f11 + f00 + f10 + f01
+        return (f11 + f00) / total if total != 0 else 0
+
+    # Compute JC and SMC matrices
+    n = len(df_20)
+    jc_matrix = np.zeros((n, n))
+    smc_matrix = np.zeros((n, n))
+
+    for i in range(n):
+        for j in range(n):
+            vec1 = df_20.loc[i, binary_cols].values
+            vec2 = df_20.loc[j, binary_cols].values
+            jc_matrix[i, j] = jaccard(vec1, vec2)
+            smc_matrix[i, j] = smc(vec1, vec2)
+
+    # Plot heatmaps
+    plt.figure(figsize=(18, 5))
+
+    plt.subplot(1, 3, 1)
+    sns.heatmap(jc_matrix, annot=False, cmap='Blues', square=True, cbar=True)
+    plt.title("Jaccard Coefficient")
+
+    plt.subplot(1, 3, 2)
+    sns.heatmap(smc_matrix, annot=False, cmap='Greens', square=True, cbar=True)
+    plt.title("Simple Matching Coefficient")
+
+    plt.subplot(1, 3, 3)
+    sns.heatmap(cos_sim_matrix, annot=False, cmap='Reds', square=True, cbar=True)
+    plt.title("Cosine Similarity")
+
+    plt.tight_layout()
+    
+    if save_path:
+        plt.savefig(save_path)
+    plt.show()
+
+#A8
+import pandas as pd
+import numpy as np
+
+def impute_missing_values(file_path, sheet_name, na_values=["?"], return_df=False):
+    # Load the data
+    df = pd.read_excel(file_path, sheet_name=sheet_name, na_values=na_values)
+    filled_columns = []
+
+    # Impute categorical columns with Mode
+    cat_cols = df.select_dtypes(include='object').columns
+    df[cat_cols] = df[cat_cols].apply(lambda col: col.fillna(col.mode()[0]))
+    filled_columns += [f"{col} (Mode)" for col in cat_cols if df[col].isnull().sum() == 0]
+
+    # Helper function to impute numeric columns based on outlier presence
+    def impute_numeric(col):
+        if col.isnull().sum() == 0:
+            return col
+        q1, q3 = col.quantile([0.25, 0.75])
+        iqr = q3 - q1
+        has_outlier = ((col < (q1 - 1.5 * iqr)) | (col > (q3 + 1.5 * iqr))).any()
+        method = "Median" if has_outlier else "Mean"
+        filled_columns.append(f"{col.name} ({method})")
+        return col.fillna(col.median() if has_outlier else col.mean())
+
+    # Apply to numeric columns
+    num_cols = df.select_dtypes(include=np.number).columns
+    df[num_cols] = df[num_cols].apply(impute_numeric)
+
+    # Print summary
+    print("Imputation complete.\nFilled columns and methods used:")
+    for col in filled_columns:
+        print(f"→ {col}")
+
+    remaining_missing = df.isnull().sum().sum()
+    if remaining_missing == 0:
+        print("\nAll missing values successfully imputed.")
+    else:
+        print(f"\nThere are still {remaining_missing} missing values remaining.")
+
+    return df if return_df else None
+
 
 
 # --------- A1: Purchase Data Analysis ---------
@@ -231,4 +372,7 @@ if jc < smc:
 else:
     print("Both coefficients indicate similarity, but are used differently.")
 
-#A5
+#A6
+cosineSimilarity(df_thyroid)
+
+#A7
