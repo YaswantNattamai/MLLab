@@ -96,8 +96,8 @@ def plot_chg_vs_day(df):
 #A4
 
 def load_thyroid_data(file_path="Lab-Session-Data.xlsx"):
-    return pd.read_excel(file_path, sheet_name='thyroid0387_UCI')
-
+    return pd.read_excel(file_path, sheet_name='thyroid0387_UCI',na_values=['?'])
+    
 def summarize_attributes(df):
     """Return summary table for each attribute: datatype, kind, encoding, missing, range."""
     summary = []
@@ -141,6 +141,7 @@ def outlier_count(df):
         mask = (df[col] < (Q1 - 1.5 * IQR)) | (df[col] > (Q3 + 1.5 * IQR))
         outliers[col] = mask.sum()
     return outliers
+
 
 #A5
 
@@ -227,3 +228,5 @@ if jc < smc:
     print("Jaccard is stricter: only positive matches; SMC includes negatives.")
 else:
     print("Both coefficients indicate similarity, but are used differently.")
+
+#A5
