@@ -141,3 +141,31 @@ def outlier_count(df):
         mask = (df[col] < (Q1 - 1.5 * IQR)) | (df[col] > (Q3 + 1.5 * IQR))
         outliers[col] = mask.sum()
     return outliers
+
+#A5
+
+def get_first_two_binary_vectors(df):
+    """Extract the first two binary observation vectors from binary columns."""
+    binary_cols = [
+        col for col in df.columns
+        if set(df[col].dropna().unique()) <= {'t', 'f', 0, 1}
+    ]
+    binmat = df[binary_cols].replace({'t': 1, 'f': 0}).astype(int)
+    return binmat.iloc[0].values, binmat.iloc[1].values
+
+def jaccard_coefficient(vec1, vec2):
+    """Return Jaccard coefficient for two binary vectors."""
+    f11 = np.sum((vec1 == 1) & (vec2 == 1))
+    f10 = np.sum((vec1 == 1) & (vec2 == 0))
+    f01 = np.sum((vec1 == 0) & (vec2 == 1))
+    denom = f11 + f10 + f01
+    return f11 / denom if denom != 0 else np.nan
+
+def smc_coefficient(vec1, vec2):
+    """Return Simple Matching Coefficient for two binary vectors."""
+    f11 = np.sum((vec1 == 1) & (vec2 == 1))
+    f00 = np.sum((vec1 == 0) & (vec2 == 0))
+    f10 = np.sum((vec1 == 1) & (vec2 == 0))
+    f01 = np.sum((vec1 == 0) & (vec2 == 1))
+    total = f11 + f00 + f10 + f01
+    return (f11 + f00) / total if total != 0 else np.nan
