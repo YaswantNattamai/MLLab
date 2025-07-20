@@ -171,6 +171,8 @@ def smc_coefficient(vec1, vec2):
     total = f11 + f00 + f10 + f01
     return (f11 + f00) / total if total != 0 else np.nan
 
+'''                                                                                                                                 '''
+
 
 # --------- A1: Purchase Data Analysis ---------
 A, C, purchase_df = load_purchase_data()
