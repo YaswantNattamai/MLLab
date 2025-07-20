@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-from sklearn 
 
 #A1
 
@@ -312,6 +311,39 @@ def impute_missing_values(file_path, sheet_name, na_values=["?"], return_df=Fals
         print(f"\nThere are still {remaining_missing} missing values remaining.")
 
     return df if return_df else None
+
+#A9
+import pandas as pd
+import numpy as np
+from sklearn.preprocessing import MinMaxScaler
+
+def impute_and_normalize(file_path, sheet_name, na_values=["?"], return_df=False):
+    # Load dataset
+    df = pd.read_excel(file_path, sheet_name=sheet_name, na_values=na_values)
+
+    # Impute categorical columns with mode
+    for col in df.select_dtypes(include='object').columns:
+        df[col] = df[col].fillna(df[col].mode()[0])
+
+    # Impute numerical columns with mean or median based on outliers
+    for col in df.select_dtypes(include=np.number).columns:
+        if df[col].isnull().sum() == 0:
+            continue
+        q1, q3 = df[col].quantile([0.25, 0.75])
+        iqr = q3 - q1
+        has_outlier = ((df[col] < (q1 - 1.5 * iqr)) | (df[col] > (q3 + 1.5 * iqr))).any()
+        df[col] = df[col].fillna(df[col].median() if has_outlier else df[col].mean())
+
+    # Normalize numeric columns using Min-Max scaling
+    numeric_cols = df.select_dtypes(include=np.number).columns
+    scaler = MinMaxScaler()
+    df_normalized = df.copy()
+    df_normalized[numeric_cols] = scaler.fit_transform(df[numeric_cols])
+
+    print("Normalization complete. Sample normalized data:")
+    print(df_normalized[numeric_cols].head())
+
+    return df_normalized if return_df else None
 
 
 
