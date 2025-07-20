@@ -272,6 +272,8 @@ def analyze_similarity_metrics(file_path, sheet_name, save_path=None):
     plt.show()
 
 #A8
+import pandas as pd
+import numpy as np
 
 def impute_missing_values(file_path, sheet_name, na_values=["?"], return_df=False):
     # Load the data
