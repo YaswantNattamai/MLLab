@@ -169,3 +169,61 @@ def smc_coefficient(vec1, vec2):
     f01 = np.sum((vec1 == 0) & (vec2 == 1))
     total = f11 + f00 + f10 + f01
     return (f11 + f00) / total if total != 0 else np.nan
+
+
+# --------- A1: Purchase Data Analysis ---------
+A, C, purchase_df = load_purchase_data()
+dim, n_vecs, rk = get_vector_space_properties(A)
+costs = estimate_product_costs(A, C)
+print("A1: PURCHASE DATA ANALYSIS")
+print(f"Dimensionality of vector space: {dim}")
+print(f"Number of vectors: {n_vecs}")
+print(f"Rank of Purchase Quantity Matrix: {rk}")
+print(f"Estimated product costs: {costs}\n")
+
+# --------- A2: Rich/Poor Classifier ---------
+purchase_df = add_rich_poor_labels(purchase_df)
+report = train_classifier(A, purchase_df['Class'])
+print("A2: RICH/POOR CLASSIFICATION REPORT:")
+print(report)
+
+# --------- A3: IRCTC Stock Data Analysis ---------
+stock_df = load_irctc_stock_data()
+mean_price, var_price = get_price_mean_variance(stock_df)
+wed_mean, n_wed, n_all = wednesday_price_stats(stock_df)
+april_mean = april_price_mean(stock_df)
+loss_prob = loss_probability(stock_df)
+profit_wed_prob = profit_probability_wednesday(stock_df)
+cond_prob = conditional_profit_given_wednesday(stock_df)
+print("A3: IRCTC STOCK DATA ANALYSIS")
+print(f"Mean price: {mean_price}, Variance: {var_price}")
+print(f"Wednesday mean price: {wed_mean} (Wednesdays: {n_wed}, Total: {n_all})")
+print(f"April mean price: {april_mean}")
+print(f"Probability of Loss: {loss_prob:.2f}")
+print(f"Probability of Profit on Wednesday: {profit_wed_prob:.2f}")
+print(f"Conditional P(Profit|Wednesday): {cond_prob:.2f}")
+
+print("Plotting Chg% vs Day of Week...")
+plot_chg_vs_day(stock_df)  # This will show a plot
+
+# --------- A4: Thyroid Data Exploration ---------
+thy_df = load_thyroid_data()
+summary_df = summarize_attributes(thy_df)
+num_stats = numeric_stats(thy_df)
+outliers = outlier_count(thy_df)
+print("A4: THYROID DATA SUMMARY")
+print("Attribute summary:\n", summary_df)
+print("Numeric mean and variance:\n", num_stats)
+print("Outlier count (numeric cols):\n", outliers)
+
+# --------- A5: Jaccard & SMC Similarity ---------
+vec1, vec2 = get_first_two_binary_vectors(thy_df)
+jc = jaccard_coefficient(vec1, vec2)
+smc = smc_coefficient(vec1, vec2)
+print("A5: SIMILARITY MEASURES")
+print(f"Jaccard coefficient: {jc:.3f}")
+print(f"Simple Matching coefficient: {smc:.3f}")
+if jc < smc:
+    print("Jaccard is stricter: only positive matches; SMC includes negatives.")
+else:
+    print("Both coefficients indicate similarity, but are used differently.")
