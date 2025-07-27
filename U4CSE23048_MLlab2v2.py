@@ -1,10 +1,5 @@
-# Machine Learning Lab Assignment: Consolidated and Structured Code
-# Author: [Your Name]
-# Roll No: [Your Roll Number]
-# Date: [Today's Date]
-# ----------------------------------------------
-# All questions (A1-A9) with clearly separated code blocks and final output section for easy reproduction.
-# ----------------------------------------------
+
+
 
 import pandas as pd
 import numpy as np
@@ -16,7 +11,6 @@ from sklearn.metrics import classification_report
 from sklearn.preprocessing import LabelEncoder, MinMaxScaler
 import statistics
 
-# --------- A1: Purchase Data Analysis ---------
 
 def load_purchase_data(file_path="Lab-Session-Data.xlsx"):
     """Load the 'Purchase data' worksheet and return feature and label matrices."""
