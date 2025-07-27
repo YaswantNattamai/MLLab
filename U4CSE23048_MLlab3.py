@@ -125,16 +125,3 @@ print(confusion_matrix(y_train, y_train_pred))
 print("Classification Report (Train):")
 print(classification_report(y_train, y_train_pred))
 
-# Basic interpretation of fit
-test_acc = neigh.score(X_test, y_test)
-train_acc = neigh.score(X_train, y_train)
-
-if abs(train_acc - test_acc) > 0.1:
-    if train_acc > test_acc:
-        fit_type = "Overfitting"
-    else:
-        fit_type = "Underfitting"
-else:
-    fit_type = "Good Fit (Regular Fit)"
-
-print(f"\nModel Fit Analysis: {fit_type}")
