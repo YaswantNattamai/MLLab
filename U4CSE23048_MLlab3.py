@@ -66,7 +66,7 @@ plt.xticks(r_values)
 plt.savefig("LAB3question3plot.jpg")
 plt.show()
 
-# A4–A7: Train and Test KNN with k = 3
+# A4–A7: Training and Test KNN with k = 3
 df = pd.read_csv("KNNAlgorithmDataset.csv")
 df = df.drop(columns=["id", "Unnamed: 32"], errors="ignore")
 
@@ -117,11 +117,5 @@ print(confusion_matrix(y_test, y_test_pred))
 print("Classification Report (Test):")
 print(classification_report(y_test, y_test_pred))
 
-# Train Data Evaluation
-print("\nTrain Data Evaluation:")
-y_train_pred = neigh.predict(X_train)
-print("Confusion Matrix (Train):")
-print(confusion_matrix(y_train, y_train_pred))
-print("Classification Report (Train):")
-print(classification_report(y_train, y_train_pred))
+
 

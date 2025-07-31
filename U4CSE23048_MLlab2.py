@@ -61,32 +61,26 @@ def get_price_mean_variance(df):
     return statistics.mean(prices), statistics.variance(prices)
 
 def wednesday_price_stats(df):
-    """Return mean price for Wednesdays, and counts for Wednesday and all observations."""
     is_wed = df['Day'].str.startswith('Wed')
     wednesday_prices = df.loc[is_wed, 'Price']
     return statistics.mean(wednesday_prices), wednesday_prices.size, df.shape[0]
 
 def april_price_mean(df):
-    """Return mean price for April."""
     april_prices = df.loc[df['Month'] == 'Apr', 'Price']
     return statistics.mean(april_prices)
 
 def loss_probability(df):
-    """Return probability of loss (Chg% < 0) over the stock."""
     return (df['Chg%'] < 0).mean()
 
 def profit_probability_wednesday(df):
-    """Return probability of profit (Chg% > 0) on Wednesdays."""
     wed_mask = df['Day'].str.startswith('Wed')
     return (df.loc[wed_mask, 'Chg%'] > 0).mean()
 
 def conditional_profit_given_wednesday(df):
-    """Return P(Profit | Wednesday)."""
     wed_mask = df['Day'].str.startswith('Wed')
     return (df.loc[wed_mask, 'Chg%'] > 0).sum() / wed_mask.sum()
 
 def plot_chg_vs_day(df):
-    """Scatter plot: Chg% vs. Day of week."""
     plt.figure(figsize=(10, 5))
     sns.scatterplot(x=df['Day'], y=df['Chg%'])
     plt.title('Chg% vs. Day of Week')
@@ -100,7 +94,6 @@ def load_thyroid_data(file_path="Lab-Session-Data.xlsx"):
     return pd.read_excel(file_path, sheet_name='thyroid0387_UCI',na_values=['?'])
     
 def summarize_attributes(df):
-    """Return summary table for each attribute: datatype, kind, encoding, missing, range."""
     summary = []
     for col in df.columns:
         col_data = df[col]
@@ -126,14 +119,12 @@ def summarize_attributes(df):
     return pd.DataFrame(summary)
 
 def numeric_stats(df):
-    """Return mean and variance for numeric columns."""
     stats = {}
     for col in df.select_dtypes(include=[np.number]).columns:
         stats[col] = {'mean': df[col].mean(), 'variance': df[col].var()}
     return stats
 
 def outlier_count(df):
-    """Return count of outliers (outside 1.5*IQR) for each numeric column."""
     outliers = {}
     for col in df.select_dtypes(include=[np.number]):
         Q1 = df[col].quantile(0.25)
@@ -147,7 +138,6 @@ def outlier_count(df):
 #A5
 
 def get_first_two_binary_vectors(df):
-    """Extract the first two binary observation vectors from binary columns."""
     binary_cols = [
         col for col in df.columns
         if set(df[col].dropna().unique()) <= {'t', 'f', 0, 1}
@@ -156,7 +146,6 @@ def get_first_two_binary_vectors(df):
     return binmat.iloc[0].values, binmat.iloc[1].values
 
 def jaccard_coefficient(vec1, vec2):
-    """Return Jaccard coefficient for two binary vectors."""
     f11 = np.sum((vec1 == 1) & (vec2 == 1))
     f10 = np.sum((vec1 == 1) & (vec2 == 0))
     f01 = np.sum((vec1 == 0) & (vec2 == 1))
@@ -164,7 +153,6 @@ def jaccard_coefficient(vec1, vec2):
     return f11 / denom if denom != 0 else np.nan
 
 def smc_coefficient(vec1, vec2):
-    """Return Simple Matching Coefficient for two binary vectors."""
     f11 = np.sum((vec1 == 1) & (vec2 == 1))
     f00 = np.sum((vec1 == 0) & (vec2 == 0))
     f10 = np.sum((vec1 == 1) & (vec2 == 0))
