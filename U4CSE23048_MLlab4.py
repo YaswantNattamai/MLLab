@@ -1,6 +1,4 @@
-# ======================================================
 # SECTION A1: KNN Classification on Breast Cancer Data
-# ======================================================
 
 import pandas as pd
 import numpy as np
@@ -38,9 +36,7 @@ else:
     fit_type = "Good Fit (Regular Fit)"
 print(f"\nModel Fit Analysis: {fit_type}")
 
-# ======================================================
 # SECTION A2: Linear Regression on Purchase Data
-# ======================================================
 
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, mean_absolute_percentage_error, r2_score
@@ -82,9 +78,7 @@ print(f"Root Mean Squared Error (RMSE): {rmse:.2f}")
 print(f"Mean Absolute Percentage Error (MAPE): {mape:.4f}")
 print(f"R² Score: {r2:.4f}")
 
-# ======================================================
 # SECTION A3: Plot 20 Random Labeled Points in 2D
-# ======================================================
 
 import matplotlib.pyplot as plt
 
@@ -105,9 +99,7 @@ plt.legend()
 plt.grid(True)
 plt.show()
 
-# ======================================================
 # SECTION A4: kNN Classification (k=3) of 2D Grid
-# ======================================================
 
 from sklearn.neighbors import KNeighborsClassifier
 
@@ -143,9 +135,7 @@ plt.legend()
 plt.grid(True)
 plt.show()
 
-# ======================================================
 # SECTION A5: kNN Classification with Varying k on 2D Grid
-# ======================================================
 
 np.random.seed(42)
 X_train_vals = np.random.uniform(1, 10, 20)
@@ -180,9 +170,8 @@ for k in k_values:
     plt.grid(True)
     plt.show()
 
-# ======================================================
 # SECTION A6: kNN Decision Boundaries on Real Dataset Subset
-# ======================================================
+
 
 import matplotlib.gridspec as gridspec
 
@@ -219,9 +208,7 @@ plt.suptitle("kNN Boundaries on Real Dataset Subset")
 plt.tight_layout(rect=[0,0,1,0.95])
 plt.show()
 
-# ======================================================
-# SECTION A7: kNN Hyperparameter Tuning with GridSearchCV
-# ======================================================
+
 
 from sklearn.model_selection import GridSearchCV
 
