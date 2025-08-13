@@ -33,9 +33,9 @@ def prepare_regression_data(feature_columns, target_column="clarity_score", test
     return train_test_split(X, y, test_size=test_size, random_state=random_state)
 
 
-# =================================================
+
 # A1: Train Linear Regression with ONE feature
-# =================================================
+
 def task_A1_single_feature():
     """
     Trains Linear Regression model using ONE feature: 'mfcc_1'.
@@ -46,9 +46,7 @@ def task_A1_single_feature():
     return model, X_train, X_test, y_train, y_test
 
 
-# =================================================
 # A2: Evaluate model from A1 - Calculate MSE, RMSE, MAPE, and R2
-# =================================================
 def task_A2_evaluate_single(model, X_train, X_test, y_train, y_test):
     """
     Evaluates Linear Regression model from A1 using various metrics
@@ -73,9 +71,7 @@ def task_A2_evaluate_single(model, X_train, X_test, y_train, y_test):
     return metrics
 
 
-# =================================================
 # A3: Train Linear Regression with ALL features (except target & id)
-# =================================================
 def task_A3_all_features():
     """
     Trains Linear Regression model using ALL numerical features except
@@ -88,9 +84,7 @@ def task_A3_all_features():
     return model, X_train, X_test, y_train, y_test
 
 
-# =================================================
 # A4: K-Means clustering (k=2) - ignoring target variables
-# =================================================
 def task_A4_kmeans_k2():
     """
     Performs K-Means clustering (k=2) on all features except
@@ -101,9 +95,8 @@ def task_A4_kmeans_k2():
     return kmeans, clustering_features
 
 
-# =================================================
+
 # A5: Calculate clustering metrics (Silhouette, CH, DB)
-# =================================================
 def task_A5_clustering_metrics(kmeans, X):
     """
     Calculates common clustering metrics: Silhouette, Calinski-Harabasz, Davies-Bouldin.
@@ -114,9 +107,8 @@ def task_A5_clustering_metrics(kmeans, X):
     return {"Silhouette": sil, "Calinski-Harabasz": ch, "Davies-Bouldin": db}
 
 
-# =================================================
+
 # A6: Perform K-Means with different k values, evaluate metrics
-# =================================================
 def task_A6_kmeans_diff_k(k_values=range(2, 8)):
     """
     Performs K-Means clustering for different k values and collects
@@ -133,9 +125,7 @@ def task_A6_kmeans_diff_k(k_values=range(2, 8)):
     return results
 
 
-# =================================================
 # A7: Elbow Method to find optimal k
-# =================================================
 def task_A7_elbow_plot(max_k=10):
     """
     Generates an elbow plot (Inertia vs k) to help find optimal k.
@@ -156,9 +146,7 @@ def task_A7_elbow_plot(max_k=10):
     plt.show()
 
 
-# =================================================
 # MAIN PROGRAM - CALLING FUNCTIONS
-# =================================================
 if __name__ == "__main__":
     # A1
     model_single, X_train_s, X_test_s, y_train_s, y_test_s = task_A1_single_feature()
