@@ -16,7 +16,7 @@ def prepare_regression_data(feature_columns, target_column="clarity_score", test
     return train_test_split(X, y, test_size=test_size, random_state=random_state)
 
 def task_A1_single_feature():
-    X_train, X_test, y_train, y_test = prepare_regression_data(["mfcc_1"])
+    X_train, X_test, y_train, y_test = prepare_regression_data(["mfcc_1","mfcc_2"])
     model = LinearRegression().fit(X_train, y_train)
     return model, X_train, X_test, y_train, y_test
 
