@@ -6,17 +6,12 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn import tree
 
-# -----------------------
-# Load dataset
-# -----------------------
+
 df = pd.read_csv("Project_labeled_features.csv")
 
-# Target column (labelled by you)
 target_col = "clarity_label"
 
-# -----------------------
 # A1. Entropy calculation
-# -----------------------
 def entropy(series):
     """Calculate entropy of a categorical pandas Series."""
     probs = series.value_counts(normalize=True)
@@ -30,17 +25,14 @@ def equal_width_binning(series, bins=4):
 # Example: binning Clarity_Score if needed
 df["Clarity_Score_binned"] = equal_width_binning(df["Clarity_Score"], bins=4)
 
-# -----------------------
+
 # A2. Gini Index
-# -----------------------
 def gini_index(series):
     """Calculate Gini index for a categorical pandas Series."""
     probs = series.value_counts(normalize=True)
     return 1 - np.sum(probs**2)
 
-# -----------------------
 # A3. Feature with max Information Gain
-# -----------------------
 def information_gain(df, feature, target):
     """Calculate information gain for a given feature."""
     total_entropy = entropy(df[target])
@@ -67,9 +59,8 @@ best_feature, gains = find_best_feature(df, target_col)
 print("Best root node feature:", best_feature)
 print("Information Gains:", gains)
 
-# -----------------------
+
 # A4. Equal-width / Equal-frequency binning function
-# -----------------------
 def binning(series, bins=4, method='width'):
     """
     Bins a numeric series into categories.
@@ -82,10 +73,8 @@ def binning(series, bins=4, method='width'):
     else:
         raise ValueError("Method must be 'width' or 'frequency'")
 
-# -----------------------
+
 # A5. Build Decision Tree with sklearn
-# -----------------------
-# Encode categorical features if needed
 df_encoded = df.copy()
 for col in df_encoded.columns:
     if df_encoded[col].dtype == 'object':
@@ -100,17 +89,14 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_
 clf = DecisionTreeClassifier(criterion='entropy', random_state=42)
 clf.fit(X_train, y_train)
 
-# -----------------------
+
 # A6. Visualize Decision Tree
-# -----------------------
 plt.figure(figsize=(15,8))
 plot_tree(clf, feature_names=X.columns, class_names=str(clf.classes_), filled=True)
 plt.show()
 
-# -----------------------
+
 # A7. Decision Boundary for 2 features
-# -----------------------
-# Pick first two features for plotting
 feat1, feat2 = X.columns[0], X.columns[1]
 X2 = df_encoded[[feat1, feat2]]
 X_train2, X_test2, y_train2, y_test2 = train_test_split(X2, y, test_size=0.3, random_state=42)
